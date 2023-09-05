@@ -12,7 +12,7 @@ const getRecordForWorkout = (workoutId) => {
 
     return record;
   } catch (error) {
-    throw { status: error?.status || 500, message: error?.message || error };
+    throw { status: error.status || 500, message: error.message || error };
   }
 };
 

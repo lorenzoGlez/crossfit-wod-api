@@ -1,11 +1,11 @@
-const DB = require("./db.json");
+const DB = require("./fingerprintDB.json");
 const { saveToDatabase } = require("./utils");
 
 /**
  * @openapi
  * components:
  *   schemas:
- *     Workout:
+ *     Fingerprint:
  *       type: object
  *       properties:
  *         id:
@@ -39,108 +39,108 @@ const { saveToDatabase } = require("./utils");
  *             type: string
  *           example: ["Split the 21 thrusters as needed", "Try to do the 9 and 6 thrusters unbroken", "RX Weights: 115lb/75lb"]
  */
-const getAllWorkouts = (filterParams) => {
+const getAllFingerprints = (filterParams) => {
   try {
-    let workouts = DB.workouts;
-    if (filterParams.mode) {
-      return DB.workouts.filter((workout) =>
-        workout.mode.toLowerCase().includes(filterParams.mode)
+    let fingerprints = DB.fingerprints;
+    if (filterParams.incognito) {
+      return DB.fingerprints.filter((fingerprint) =>
+        fingerprint.incognito.toLowerCase().includes(filterParams.incognito)
       );
     }
-    return workouts;
+    return fingerprints;
   } catch (error) {
     throw { status: 500, message: error };
   }
 };
 
-const getOneWorkout = (workoutId) => {
+const getOneFingerprint = (visitorId) => {
   try {
-    const workout = DB.workouts.find((workout) => workout.id === workoutId);
+    const fingerprint = DB.fingerprints.find((fingerprint) => fingerprint.visitorId === visitorId);
 
-    if (!workout) {
+    if (!fingerprint) {
       throw {
         status: 400,
-        message: `Can't find workout with the id '${workoutId}'`,
+        message: `Can't find fingerprint with the id '${visitorId}'`,
       };
     }
 
-    return workout;
+    return fingerprint;
   } catch (error) {
     throw { status: error.status || 500, message: error.message || error };
   }
 };
 
-const createNewWorkout = (newWorkout) => {
+const createNewFingerprint = (newFingerprint) => {
   try {
     const isAlreadyAdded =
-      DB.workouts.findIndex((workout) => workout.name === newWorkout.name) > -1;
+      DB.fingerprints.findIndex((fingerprint) => fingerprint.visitorId === newFingerprint.visitorId) > -1;
 
     if (isAlreadyAdded) {
       throw {
         status: 400,
-        message: `Workout with the name '${newWorkout.name}' already exists`,
+        message: `Fingerprint with the name '${newFingerprint.visitorId}' already exists`,
       };
     }
 
-    DB.workouts.push(newWorkout);
+    DB.fingerprints.push(newFingerprint);
     saveToDatabase(DB);
 
-    return newWorkout;
+    return newFingerprint;
   } catch (error) {
     throw { status: 500, message: error.message || error };
   }
 };
 
-const updateOneWorkout = (workoutId, changes) => {
+const updateOneFingerprint = (visitorId, changes) => {
   try {
     const isAlreadyAdded =
-      DB.workouts.findIndex((workout) => workout.name === changes.name) > -1;
+      DB.fingerprints.findIndex((fingerprint) => fingerprint.visitorId === changes.visitorId) > -1;
 
     if (isAlreadyAdded) {
       throw {
         status: 400,
-        message: `Workout with the name '${changes.name}' already exists`,
+        message: `Fingerprint with the name '${changes.visitorId}' already exists`,
       };
     }
 
-    const indexForUpdate = DB.workouts.findIndex(
-      (workout) => workout.id === workoutId
+    const indexForUpdate = DB.fingerprints.findIndex(
+      (fingerprint) => fingerprint.visitorId === visitorId
     );
 
     if (indexForUpdate === -1) {
       throw {
         status: 400,
-        message: `Can't find workout with the id '${workoutId}'`,
+        message: `Can't find fingerprint with the id '${visitorId}'`,
       };
     }
 
-    const updatedWorkout = {
-      ...DB.workouts[indexForUpdate],
+    const updatedFingerprint = {
+      ...DB.fingerprints[indexForUpdate],
       ...changes,
       updatedAt: new Date().toLocaleString("en-US", { timeZone: "UTC" }),
     };
 
-    DB.workouts[indexForUpdate] = updatedWorkout;
+    DB.fingerprints[indexForUpdate] = updatedFingerprint;
     saveToDatabase(DB);
 
-    return updatedWorkout;
+    return updatedFingerprint;
   } catch (error) {
     throw { status: error.status || 500, message: error.message || error };
   }
 };
 
-const deleteOneWorkout = (workoutId) => {
+const deleteOneFingerprint = (visitorId) => {
   try {
-    const indexForDeletion = DB.workouts.findIndex(
-      (workout) => workout.id === workoutId
+    const indexForDeletion = DB.fingerprints.findIndex(
+      (fingerprint) => fingerprint.visitorId === visitorId
     );
     if (indexForDeletion === -1) {
       throw {
         status: 400,
-        message: `Can't find workout with the id '${workoutId}'`,
+        message: `Can't find fingerprint with the id '${visitorId}'`,
       };
     }
-    DB.workouts.splice(indexForDeletion, 1);
+    DB.fingerprints.splice(indexForDeletion, 1);
     saveToDatabase(DB);
   } catch (error) {
     throw { status: error.status || 500, message: error.message || error };
@@ -148,9 +148,9 @@ const deleteOneWorkout = (workoutId) => {
 };
 
 module.exports = {
-  getAllWorkouts,
-  getOneWorkout,
-  createNewWorkout,
-  updateOneWorkout,
-  deleteOneWorkout,
+  getAllFingerprints,
+  getOneFingerprint,
+  createNewFingerprint,
+  updateOneFingerprint,
+  deleteOneFingerprint,
 };
